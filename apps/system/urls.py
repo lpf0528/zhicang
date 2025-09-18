@@ -17,13 +17,8 @@ Including another URLconf
 
 from django.urls import path, include
 
-from system.views import ZcRegisterView, ZcLoginView
+from system.views import InvoiceInfoView
 
 urlpatterns = [
-    # path("admin/", admin.site.urls),
-    # path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
-    path("register/", ZcRegisterView.as_view(), name="register"),
-    path("login/", ZcLoginView.as_view(), name="login"),
-    path("system/", include("system.urls")),
-
+    path("invoice/", InvoiceInfoView.as_view(), name="invoice_info"),
 ]

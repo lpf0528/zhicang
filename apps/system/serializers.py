@@ -1,24 +1,20 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
-from system.models import ZcUser
-
-
-# class ZcTokenObtainPairSerializer(TokenObtainPairSerializer):
-#     @classmethod
-#     def get_token(cls, user):
-#         token = super().get_token(user)
-#
-#         # Add custom claims
-#         token['username'] = user.username
-#
-#         return token
+from rest_framework import status
+from common.exception.app_exception import AppApiException
+from system.models import ZcUser, InvoiceInfo
 
 
 class ZcRegisterSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=100, required=False, label='用户名')
-    password = serializers.CharField(max_length=100, required=False, label='密码')
-    auth_code = serializers.CharField(max_length=100, required=False, label='授权码')
+    username = serializers.CharField(max_length=20, required=True, label='用户名',
+                                     error_messages={'max_length': '用户名长度不能超过20位',
+                                                     'required': '用户名是必填的'})
+    password = serializers.CharField(max_length=50, required=True, label='密码',
+                                     error_messages={'max_length': '密码长度不能超过30位',
+                                                     'required': '密码是必填的'})
+    auth_code = serializers.CharField(max_length=9, min_length=9, required=False, label='授权码',
+                                      error_messages={'max_length': '请输入9位授权码',
+                                                      'min_length': '请输入9位授权码'})
 
     def validate_username(self, value):
         if ZcUser.objects.filter(username=value).exists():
@@ -40,3 +36,42 @@ class ZcRegisterSerializer(serializers.Serializer):
             'refresh': tokens['refresh'],
             'access': tokens['access'],
         }
+
+
+class ZcLoginSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=20, required=True, label='用户名',
+                                     error_messages={'max_length': '用户名长度不能超过20位',
+                                                     'required': '用户名是必填的'})
+    password = serializers.CharField(max_length=50, required=True, label='密码',
+                                     error_messages={'max_length': '密码长度不能超过30位',
+                                                     'required': '密码是必填的'})
+
+    def validate(self, attrs):
+        username = attrs.get('username')
+        password = attrs.get('password')
+
+        user = ZcUser.objects.filter(username=username).first()
+        if not user:
+            raise serializers.ValidationError('用户名不存在')
+        if not user.check_password(password):
+            raise serializers.ValidationError('密码错误')
+        tokens = ZcUser.get_tokens_for_user(user)
+        return {
+            'refresh': tokens['refresh'],
+            'access': tokens['access'],
+        }
+
+
+class InvoiceInfoModelSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(max_length=255, required=True, label='单据标题',
+                                  error_messages={'required': '单据标题是必填的'})
+    address = serializers.CharField(max_length=500, required=True, label='单据地址',
+                                    error_messages={'required': '单据地址是必填的'})
+    telephone = serializers.CharField(max_length=255, required=True, label='单据电话(多个；)',
+                                      error_messages={'required': '单据电话是必填的'})
+    remark = serializers.CharField(max_length=500, required=True, label='备注',
+                                   error_messages={'required': '备注是必填的'})
+
+    class Meta:
+        model = InvoiceInfo
+        fields = ('id', 'title', 'address', 'telephone', 'remark', 'tip')

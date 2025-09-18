@@ -8,10 +8,10 @@ from apps.common.models import BaseModel
 
 class InvoiceInfo(BaseModel):
     title = models.CharField(max_length=255, verbose_name='单据标题')
-    address = models.CharField(max_length=255, verbose_name='单据地址')
+    address = models.CharField(max_length=500, verbose_name='单据地址')
     telephone = models.CharField(max_length=255, verbose_name='单据电话(多个；)')
-    remark = models.CharField(max_length=255, verbose_name='备注', null=True, blank=True)
-    tip = models.CharField(max_length=255, verbose_name='提示',
+    remark = models.CharField(max_length=500, verbose_name='备注', null=True, blank=True)
+    tip = models.CharField(max_length=500, verbose_name='提示',
                            default='温馨提示：请细查货物，如有质量问题请在七天内提出，一经开剪，恕不退换，谢谢合作。')
 
     class Meta:

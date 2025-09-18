@@ -93,7 +93,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated'  # 设置全局所有视图需要jwt鉴权
     ],
-    'EXCEPTION_HANDLER': 'common.handle.handle_exception.handle_exception',
+    'EXCEPTION_HANDLER': 'common.exception.app_exception.handle_exception',
 
     # 修改默认返回JSON的renderer的类
     # 'DEFAULT_RENDERER_CLASSES': (
