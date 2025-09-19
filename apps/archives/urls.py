@@ -16,16 +16,14 @@ Including another URLconf
 """
 
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
-from system.views import ZcRegisterView, ZcLoginView
+from archives.views import SupplierViewSet, CustomerViewSet
+
+router = DefaultRouter()
+router.register(r'supplier', SupplierViewSet)
+router.register(r'customer', CustomerViewSet)
 
 urlpatterns = [
-    # path("admin/", admin.site.urls),
-    # path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
-    path("register/", ZcRegisterView.as_view(), name="register"),
-    path("login/", ZcLoginView.as_view(), name="login"),
-    path("system/", include("system.urls")),
-    path("archives/", include("archives.urls")),
-    path("warehouse/", include("warehouse.urls")),
-
+    path('', include(router.urls)),
 ]

@@ -20,23 +20,6 @@ class InvoiceInfo(BaseModel):
         verbose_name_plural = '单据信息'
 
 
-class CategoryConfig(BaseModel):
-    class TypeChoices(models.TextChoices):
-        # 客户
-        CUSTOMER = 'customer', '客户：省内/省外'
-        # 供应商
-        SUPPLIER = 'supplier', '供应商：织厂/批发商'
-
-    type = models.CharField(max_length=255, verbose_name='系统配置类型', choices=TypeChoices.choices)
-    name = models.CharField(max_length=255, verbose_name='类别名称')
-    remark = models.CharField(max_length=255, verbose_name='备注', null=True, blank=True)
-
-    class Meta:
-        db_table = 'category_config'
-        verbose_name = '类别配置'
-        verbose_name_plural = '类别配置'
-
-
 class SystemConfig(BaseModel):
     class TypeChoices(models.TextChoices):
         PRODUCT_CATEGORY = 'product_category', '货物类别：布/纱/书版'
@@ -45,9 +28,11 @@ class SystemConfig(BaseModel):
         SETTLEMENT_METHOD = 'settlement_method', '结算方式：现金/月结/微信'
         LOGISTIC = 'logistic', '货运部：顺丰/拼包/申通/圆通'
         PAYMENT_METHOD = 'payment_method', '收款方式：现金/微信/支付宝'
+        CUSTOMER = 'customer', '客户：省内/省外'
+        SUPPLIER = 'supplier', '供应商：织厂/批发商'
 
-    type = models.CharField(max_length=255, verbose_name='系统配置类型', choices=TypeChoices.choices)
-    name = models.CharField(max_length=255, verbose_name='系统配置名称')
+    type = models.CharField(max_length=50, verbose_name='系统配置类型', choices=TypeChoices.choices)
+    value = models.CharField(max_length=255, verbose_name='系统配置值', default='')
     remark = models.CharField(max_length=255, verbose_name='备注', null=True, blank=True)
 
     class Meta:

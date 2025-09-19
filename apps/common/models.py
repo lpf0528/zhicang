@@ -1,13 +1,20 @@
+import uuid
+
 from django.db import models
+
+from common.managers import AuthCodeManager
 
 
 class BaseModel(models.Model):
     auth_code = models.CharField(max_length=255, verbose_name='授权码', null=True, blank=True, db_index=True)
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
     create_user_id = models.CharField(max_length=255, verbose_name='创建用户ID', null=True, blank=True)
     update_user_id = models.CharField(max_length=255, verbose_name='更新用户ID', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)  # 动态发布时间
     updated_at = models.DateTimeField(auto_now=True)  # 动态更新时间
     is_delete = models.BooleanField(default=False, verbose_name="删除标记")
+
+    objects = AuthCodeManager()
 
     class Meta:
         abstract = True

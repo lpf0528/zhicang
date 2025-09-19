@@ -2,15 +2,13 @@ import datetime
 
 from django.db import models
 
-from apps.archives.models import Supplier, Customer
 from apps.common.models import BaseModel
-
-
-# Create your models here.
+from archives.models import Supplier, Customer
 
 
 class Warehouse(BaseModel):
-    name = models.CharField(max_length=255, verbose_name='仓库名称')
+    name = models.CharField(max_length=255, unique=True, verbose_name='仓库名称',
+                            error_messages={'unique': '仓库名称已存在'})
     remark = models.CharField(max_length=255, verbose_name='备注', null=True, blank=True)
     # 负责人
     manager = models.CharField(max_length=255, verbose_name='负责人', null=True, blank=True)

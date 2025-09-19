@@ -17,8 +17,9 @@ Including another URLconf
 
 from django.urls import path, include
 
-from system.views import InvoiceInfoView
+from system.views import InvoiceInfoView, SystemConfigView
 
 urlpatterns = [
     path("invoice/", InvoiceInfoView.as_view(), name="invoice_info"),
+    path("config/", SystemConfigView.as_view(), name="config"),
 ]

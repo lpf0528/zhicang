@@ -4,7 +4,7 @@ from apps.common.models import BaseModel
 
 
 class Supplier(BaseModel):
-    number = models.CharField(max_length=255, unique=True, verbose_name='供应商编号')
+    number = models.CharField(max_length=15, unique=True, verbose_name='供应商编号')
     name = models.CharField(max_length=255, verbose_name='供应商名称')
     category = models.CharField(max_length=255, verbose_name='供应商类别(没有及新增)：织厂/批发商', null=True,
                                 blank=True)

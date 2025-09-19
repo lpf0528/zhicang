@@ -1,14 +1,12 @@
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
-from rest_framework.viewsets import GenericViewSet
 
 from common.response import result
-from system.models import InvoiceInfo
-from system.serializers import ZcRegisterSerializer, ZcLoginSerializer, InvoiceInfoModelSerializer
+from system.models import InvoiceInfo, SystemConfig
+from system.serializers import ZcRegisterSerializer, ZcLoginSerializer, InvoiceInfoSerializer, \
+    SystemConfigSerializer
 
 from rest_framework import status
-from rest_framework.response import Response
-from rest_framework import generics, mixins, views
 
 
 class ZcRegisterView(APIView):
@@ -34,23 +32,26 @@ class ZcLoginView(APIView):
 class InvoiceInfoView(APIView):
 
     def get(self, request):
-        invoice_info = InvoiceInfo.objects.filter(auth_code=request.user.auth_code).first()
+        invoice_info = InvoiceInfo.objects.filter().first()
 
-        return result.success(InvoiceInfoModelSerializer(invoice_info).data)
+        return result.success(InvoiceInfoSerializer(invoice_info).data)
 
     def post(self, request):
-        if InvoiceInfo.objects.filter(auth_code=request.user.auth_code).exists():
-            return result.error('发票详情已存在')
-        ser = InvoiceInfoModelSerializer(data=request.data)
+        ser = InvoiceInfoSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         ser.save(auth_code=request.user.auth_code)
         return result.success()
 
-    def patch(self, request):
-        invoice_info = InvoiceInfo.objects.filter(auth_code=request.user.auth_code).first()
-        if not invoice_info:
-            return result.error('发票详情不存在')
-        ser = InvoiceInfoModelSerializer(invoice_info, data=request.data)
+
+class SystemConfigView(APIView):
+    def get(self, request):
+        instances = SystemConfig.objects.filter().all()
+        ser = SystemConfigSerializer(instances, many=True)
+        return result.success(data=ser.data)
+
+    def post(self, request):
+        ser = SystemConfigSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        ser.save()
+
+        ser.save(auth_code=request.user.auth_code)
         return result.success()

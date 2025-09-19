@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import status
 from common.exception.app_exception import AppApiException
-from system.models import ZcUser, InvoiceInfo
+from system.models import ZcUser, InvoiceInfo, SystemConfig
 
 
 class ZcRegisterSerializer(serializers.Serializer):
@@ -62,7 +62,7 @@ class ZcLoginSerializer(serializers.Serializer):
         }
 
 
-class InvoiceInfoModelSerializer(serializers.ModelSerializer):
+class InvoiceInfoSerializer(serializers.ModelSerializer):
     title = serializers.CharField(max_length=255, required=True, label='单据标题',
                                   error_messages={'required': '单据标题是必填的'})
     address = serializers.CharField(max_length=500, required=True, label='单据地址',
@@ -71,7 +71,37 @@ class InvoiceInfoModelSerializer(serializers.ModelSerializer):
                                       error_messages={'required': '单据电话是必填的'})
     remark = serializers.CharField(max_length=500, required=True, label='备注',
                                    error_messages={'required': '备注是必填的'})
+    tip = serializers.CharField(max_length=255, required=False, label='备注')
 
     class Meta:
         model = InvoiceInfo
         fields = ('id', 'title', 'address', 'telephone', 'remark', 'tip')
+        exclude = ['auth_code']
+
+    def save(self, **kwargs):
+        auth_code = kwargs.get('auth_code')
+        obj, _ = InvoiceInfo.objects.update_or_create(auth_code=auth_code,
+                                                      defaults=self.validated_data)
+        return obj
+
+
+class SystemConfigSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(choices=SystemConfig.TypeChoices.choices, required=True, label='配置类型',
+                                   error_messages={'required': '配置类型是必填的',
+                                                   'invalid_choice': '“{input}”配置类型选择错误'})
+
+    value = serializers.CharField(max_length=255, required=True, label='配置值',
+                                  error_messages={'required': '配置值是必填的'})
+    remark = serializers.CharField(max_length=255, required=False, label='备注')
+
+    def save(self, **kwargs):
+        auth_code = kwargs.get('auth_code')
+        obj, _ = SystemConfig.objects.update_or_create(auth_code=auth_code, type=self.validated_data['type'],
+                                                       defaults={'value': self.validated_data['value'],
+                                                                 'remark': self.validated_data.get('remark', '')})
+        return obj
+
+    class Meta:
+        model = SystemConfig
+        fields = ('type', 'value', 'remark')
+        exclude = ['auth_code']
